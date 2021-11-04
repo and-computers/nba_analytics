@@ -17,7 +17,6 @@ import plotly.graph_objs as go
 from data import SALARY_DATA, PER_DATA, BPM_DATA, TM_DATA
 
 
-
 """
 Resources:
 https://www.basketball-reference.com/contracts/players.html
@@ -32,38 +31,45 @@ BPM (Boxscore Plus Minus)
 """
 
 # get rid of the stuff to the right of \ i.e. LeBron James\jamesle01
-standardize = lambda f:f.rsplit('\\')[0].lower()
+standardize = lambda f: f.rsplit('\\')[0].lower()
 # make money a float not a string
+
+
 def monify(m):
-	"""Summary
-	
-	Args:
-	    m (string): money string
-	
-	Returns:
-	    float: money value
-	"""
-	try:
-		return float(re.sub('[$,]', '', m))
-	except:
-		return m
+    """Summary
+
+    Args:
+        m (string): money string
+
+    Returns:
+        float: money value
+    """
+    try:
+        return float(re.sub('[$,]', '', m))
+    except:
+        return m
 
 SALARY_DATA['Player'] = SALARY_DATA['Player'].map(standardize)
 SALARY_DATA['Guaranteed'] = SALARY_DATA['Guaranteed'].map(monify)
 PER_DATA['Player'] = PER_DATA['Player'].map(standardize)
 BPM_DATA['Player'] = BPM_DATA['Player'].map(standardize)
-TM_DATA['Win Percentage'] = TM_DATA['W']/82.
+TM_DATA['Win Percentage'] = TM_DATA['W'] / (TM_DATA['W'] + TM_DATA['L'])
 
 
+salary_cols = ['Player', 'Tm', 'Signed Using', 'Guaranteed']
+per_cols = ['Rank', 'Player', 'PER']
+bpm_cols = ['Player', 'BPM']
+tm_cols = ['Tm', 'Win Percentage']
 
-salary_cols = ['Player','Tm','Signed Using','Guaranteed']
-per_cols = ['Rank','Player','PER']
-bpm_cols = ['Player','BPM']
-tm_cols = ['Tm','Win Percentage']
+df = TM_DATA[tm_cols].merge(
+    SALARY_DATA[salary_cols].merge(
+        PER_DATA[per_cols],
+        on='Player').merge(
+            BPM_DATA[bpm_cols],
+            on='Player'),
+    on='Tm')
 
-df = TM_DATA[tm_cols].merge(SALARY_DATA[salary_cols].merge(PER_DATA[per_cols], on='Player').merge(BPM_DATA[bpm_cols], on='Player'), on='Tm')
-
-print df
+print(df)
 
 """
 Visualization
@@ -73,7 +79,14 @@ sns.set(style="whitegrid")
 f, ax = plt.subplots(figsize=(6.5, 6.5))
 
 
-contract_ranking = ["Early Bird", "Cap space", "1st Round Pick", "Non-Bird rights", "MLE", "Bi-annual Exception", "Minimum Salary"]
+contract_ranking = [
+    "Early Bird",
+    "Cap space",
+    "1st Round Pick",
+    "Non-Bird rights",
+    "MLE",
+    "Bi-annual Exception",
+    "Minimum Salary"]
 sns.scatterplot(x="PER", y="Guaranteed",
                 hue="Tm",
                 # hue_order=contract_ranking,
@@ -85,24 +98,24 @@ plt.suptitle("Player Efficiency vs. Guaranteed $\$ by Team")
 
 # plt.show()
 
-tracePER = go.Scatter(x=df['PER'],y=df['Guaranteed'],mode='markers',name='PER',
-	text=df['Player'],
-	marker=dict(
-        size=16,
-        color = df['Win Percentage'], #set color equal to a variable
-        colorbar=dict(title='Team Win Percentage (%)'),
-        colorscale='Viridis',
-        showscale=True
-    ))
-traceBPM = go.Scatter(x=df['BPM'],y=df['Guaranteed'],mode='markers',name='BPM',
-		text=df['Player'],
-	marker=dict(
-        size=16,
-        color = df['Win Percentage'], #set color equal to a variable
-        colorbar=dict(title='Team Win Percentage (%)'),
-        colorscale='Viridis',
-        showscale=True
-    ))
+tracePER = go.Scatter(x=df['PER'], y=df['Guaranteed'], mode='markers', name='PER',
+                      text=df['Player'],
+                      marker=dict(
+    size=16,
+    color=df['Win Percentage'],  # set color equal to a variable
+    colorbar=dict(title='Team Win Percentage (%)'),
+    colorscale='Viridis',
+    showscale=True
+))
+traceBPM = go.Scatter(x=df['BPM'], y=df['Guaranteed'], mode='markers', name='BPM',
+                      text=df['Player'],
+                      marker=dict(
+    size=16,
+    color=df['Win Percentage'],  # set color equal to a variable
+    colorbar=dict(title='Team Win Percentage (%)'),
+    colorscale='Viridis',
+    showscale=True
+))
 
 
 layout = go.Layout(
@@ -132,7 +145,3 @@ fig = go.Figure(data=[tracePER], layout=layout)
 pltly.plot(fig)
 
 # pltly.plot([traceBPM])
-
-
-
-

@@ -9,12 +9,27 @@ Attributes:
 """
 import os
 import re
-import pandas as pd
+#import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import plotly.offline as pltly
 import plotly.graph_objs as go
-from data import SALARY_DATA, PER_DATA, BPM_DATA, TM_DATA
+from data import SALARY_DATA_20_21, PER_DATA_20_21, TM_DATA_20_21, TM_DATA_17_18
+
+
+SALARY_DATA = SALARY_DATA_20_21
+PER_DATA = PER_DATA_20_21
+TM_DATA = TM_DATA_20_21
+
+# create mapping for team names to team abbreviations
+
+team = TM_DATA_17_18['Team']
+tm = TM_DATA_17_18['Tm']
+
+import pdb
+pdb.set_trace()
+
+team_tm_map = {x.replace('*', ''): y for x, y in zip(team, tm)}
 
 
 """
@@ -32,6 +47,9 @@ BPM (Boxscore Plus Minus)
 
 # get rid of the stuff to the right of \ i.e. LeBron James\jamesle01
 standardize = lambda f: f.rsplit('\\')[0].lower()
+
+# function for getting team abbreviation
+get_tm_abbreviation = lambda f: team_tm_map[f.replace("*", "")]
 # make money a float not a string
 
 
@@ -52,8 +70,11 @@ def monify(m):
 SALARY_DATA['Player'] = SALARY_DATA['Player'].map(standardize)
 SALARY_DATA['Guaranteed'] = SALARY_DATA['Guaranteed'].map(monify)
 PER_DATA['Player'] = PER_DATA['Player'].map(standardize)
-BPM_DATA['Player'] = BPM_DATA['Player'].map(standardize)
 TM_DATA['Win Percentage'] = TM_DATA['W'] / (TM_DATA['W'] + TM_DATA['L'])
+
+# add Team abbreviations (they stopped being available in later data pulls)
+
+TM_DATA['Tm'] = TM_DATA['Team'].map(get_tm_abbreviation)
 
 
 salary_cols = ['Player', 'Tm', 'Signed Using', 'Guaranteed']
@@ -64,9 +85,7 @@ tm_cols = ['Tm', 'Win Percentage']
 df = TM_DATA[tm_cols].merge(
     SALARY_DATA[salary_cols].merge(
         PER_DATA[per_cols],
-        on='Player').merge(
-            BPM_DATA[bpm_cols],
-            on='Player'),
+        on='Player'),
     on='Tm')
 
 print(df)
@@ -79,17 +98,8 @@ sns.set(style="whitegrid")
 f, ax = plt.subplots(figsize=(6.5, 6.5))
 
 
-contract_ranking = [
-    "Early Bird",
-    "Cap space",
-    "1st Round Pick",
-    "Non-Bird rights",
-    "MLE",
-    "Bi-annual Exception",
-    "Minimum Salary"]
 sns.scatterplot(x="PER", y="Guaranteed",
                 hue="Tm",
-                # hue_order=contract_ranking,
                 sizes=(1, 8), linewidth=0,
                 data=df, ax=ax)
 
@@ -99,15 +109,6 @@ plt.suptitle("Player Efficiency vs. Guaranteed $\$ by Team")
 # plt.show()
 
 tracePER = go.Scatter(x=df['PER'], y=df['Guaranteed'], mode='markers', name='PER',
-                      text=df['Player'],
-                      marker=dict(
-    size=16,
-    color=df['Win Percentage'],  # set color equal to a variable
-    colorbar=dict(title='Team Win Percentage (%)'),
-    colorscale='Viridis',
-    showscale=True
-))
-traceBPM = go.Scatter(x=df['BPM'], y=df['Guaranteed'], mode='markers', name='BPM',
                       text=df['Player'],
                       marker=dict(
     size=16,

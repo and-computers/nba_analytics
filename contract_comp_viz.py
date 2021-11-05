@@ -26,8 +26,6 @@ TM_DATA = TM_DATA_20_21
 team = TM_DATA_17_18['Team']
 tm = TM_DATA_17_18['Tm']
 
-import pdb
-pdb.set_trace()
 
 team_tm_map = {x.replace('*', ''): y for x, y in zip(team, tm)}
 
@@ -78,7 +76,7 @@ TM_DATA['Tm'] = TM_DATA['Team'].map(get_tm_abbreviation)
 
 
 salary_cols = ['Player', 'Tm', 'Signed Using', 'Guaranteed']
-per_cols = ['Rank', 'Player', 'PER']
+per_cols = ['Player', 'PER']
 bpm_cols = ['Player', 'BPM']
 tm_cols = ['Tm', 'Win Percentage']
 

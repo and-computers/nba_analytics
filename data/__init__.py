@@ -7,7 +7,7 @@ SALARY_DATA_20_21 = pd.read_csv(os.path.join(os.path.dirname(__file__), 'salary_
 # https://www.basketball-reference.com/leaders/per_active.html
 # https://www.basketball-reference.com/leaders/per_career.html
 PER_DATA_17_18 = pd.read_csv(os.path.join(os.path.dirname(__file__), 'PER_player_career_regszn_17_18.csv'))
-PER_DATA_20_21 = pd.read_csv(os.path.join(os.path.dirname(__file__), 'PER_player_career_regszn_20_21.csv'))
+PER_DATA_20_21 = pd.read_csv(os.path.join(os.path.dirname(__file__), 'PER_player_regszn_20_21.csv'))
 
 
 BPM_DATA_17_18 = pd.read_csv(os.path.join(os.path.dirname(__file__), 'BPM_player_career_regszn_17_18.csv'))

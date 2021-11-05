@@ -67,7 +67,10 @@ def monify(m):
 
 SALARY_DATA['Player'] = SALARY_DATA['Player'].map(standardize)
 SALARY_DATA['Guaranteed'] = SALARY_DATA['Guaranteed'].map(monify)
+# Make sure you only include players that have played at least 30 minutes in the season
+PER_DATA = PER_DATA.loc[PER_DATA.MP > 30]
 PER_DATA['Player'] = PER_DATA['Player'].map(standardize)
+
 TM_DATA['Win Percentage'] = TM_DATA['W'] / (TM_DATA['W'] + TM_DATA['L'])
 
 # add Team abbreviations (they stopped being available in later data pulls)
@@ -76,15 +79,17 @@ TM_DATA['Tm'] = TM_DATA['Team'].map(get_tm_abbreviation)
 
 
 salary_cols = ['Player', 'Tm', 'Signed Using', 'Guaranteed']
-per_cols = ['Player', 'PER']
-bpm_cols = ['Player', 'BPM']
+per_cols = ['Player', 'PER', 'BPM']
 tm_cols = ['Tm', 'Win Percentage']
+
 
 df = TM_DATA[tm_cols].merge(
     SALARY_DATA[salary_cols].merge(
         PER_DATA[per_cols],
         on='Player'),
     on='Tm')
+
+df.drop_duplicates(subset=['Player', 'Tm'], inplace=True)
 
 print(df)
 

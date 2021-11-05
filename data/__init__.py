@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 
+
 SALARY_DATA_17_18 = pd.read_csv(os.path.join(os.path.dirname(__file__), 'salary_contract_player_17_18.csv'))
 SALARY_DATA_20_21 = pd.read_csv(os.path.join(os.path.dirname(__file__), 'salary_contract_player_20_21.csv'))
 

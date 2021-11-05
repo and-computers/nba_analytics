@@ -112,7 +112,7 @@ plt.suptitle("Player Efficiency vs. Guaranteed $\$ by Team")
 # plt.show()
 
 tracePER = go.Scatter(x=df['PER'], y=df['Guaranteed'], mode='markers', name='PER',
-                      text=df['Player'],
+                      text=df['Player'] + " (" + df['Tm'] + ")",  # string formatting didnt work here
                       marker=dict(
     size=16,
     color=df['Win Percentage'],  # set color equal to a variable
